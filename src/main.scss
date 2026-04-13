@@ -1,0 +1,32 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.content {
+	height: 100vh;
+	width: 100vw;
+
+	canvas {
+		background-color: black;
+	}
+}
+
+.github-link {
+	bottom: 20px;
+	font-family: sans-serif;
+	position: absolute;
+	right: 20px;
+
+	a {
+		color: #F0F8FF;
+		text-decoration: none;
+	}
+}
+
+.debug-output {
+	position: absolute;
+	top: 100px;
+	width: 50%;
+	height: 50%;
+}

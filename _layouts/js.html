@@ -1,0 +1,28 @@
+---
+layout: default <!-- You can optionally chain this to a default layout for consistent headers/footers -->
+---
+<html>
+
+<head>
+	<title>{{ page.title }}</title>
+	<link rel="stylesheet" href="{{ site.baseurl }}/assets/styles.css">
+	<!-- <script src="{{ site.baseurl }}/assets/main.js" defer></script> -->
+	<script src="{{ '/assets/main.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+
+</head>
+
+<body>
+
+	<!-- This is where your page content goes -->
+	<div id="content" class="content">
+		<!-- <canvas></canvas> -->
+		{{ content }}
+	</div>
+
+	<div class="github-link">
+		<a href="https://github.com/adamriggs/noise" target="_blank">Repo</a>
+	</div>
+
+</body>
+
+</html>

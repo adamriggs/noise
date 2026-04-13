@@ -66,8 +66,6 @@ spriteSizeParam.update = (value) => {
 };
 spriteSizeParam.controller = gui.add(parameters, 'spriteSize', 1, 100).onChange(value => spriteSizeParam.onChange(value));
 parametersObjects.push(spriteSizeParam);
-// knobs[0] = spriteSizeParam;
-console.log(spriteSizeParam);
 
 const noise3d = gui.addFolder('3dNoise');
 

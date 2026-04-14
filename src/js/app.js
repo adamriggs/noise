@@ -132,7 +132,7 @@ const movement3dStep = (deltaTime) => {
 
 		const hue = particle.hsl.h;
 		// const saturation = (particle.hsl.s / 2) + Math.abs(pointerXForce * pointerYForce);
-		const saturation = particle.hsl.s;
+		const saturation = parseInt(particle.hsl.s, 10) + Math.abs(pointerXForce * pointerYForce);;
 		const lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
 		const opacity = 100;
 

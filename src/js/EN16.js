@@ -16,13 +16,17 @@
  * - the velocity value returns to where it was before the press/release
  * 
  */
-
+import { parametersObjects } from "./parameters";
 export const knobs = [];
 
 const onMIDISuccess = (midiAccess) => {
 	for (const input of midiAccess.inputs.values()) {
 		input.onmidimessage = getMIDIMessage;
 	}
+
+	parametersObjects.forEach((param, i) => {
+		knobs[i] = param;
+	});
 }
 
 const getMIDIMessage = (message) => {

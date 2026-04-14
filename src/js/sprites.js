@@ -1,12 +1,12 @@
 import * as PIXI from 'pixi.js';
-import { parameters, defaultParameters } from './parameters';
+import { maxParticleSize } from './parameters';
 
 // const colors = ['#DBBEAB', '#789A9C', '#ABDADB', '#866D5C', '#305A5C', '#331F12'];
 export const colors = ['#A4D2D3', '#8AB0B1', '#ABDADB', '#6F8E8F', '#556C6D', '#3A4B4B'];
 
 export const returnTexture = (app) => {
 	const gfx = new PIXI.Graphics();
-	gfx.circle(0, 0, defaultParameters.particleSize / 2);
+	gfx.circle(0, 0, maxParticleSize / 2);
 	gfx.fill({ color: '#ffffff', alpha: 1 });
 	// gfx.stroke({
 	// 	alpha: 1,

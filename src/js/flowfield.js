@@ -42,7 +42,7 @@ const update = (particle, phase) => {
 	const scale = 0.003;
 
 	// this seems like the same kind of thing as the orbiting examples but 
-	// without orbiting a center point but instead with screen wrapping
+	// without orbiting a center point and instead with screen wrapping
 	const noiseValue = noise(particle.x * scale, particle.y * scale, phase);
 
 	const angle = noiseValue * Math.PI * 2;

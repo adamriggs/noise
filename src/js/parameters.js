@@ -1,22 +1,15 @@
 import GUI from 'lil-gui';
 import { knobs } from './EN16';
 
-export const defaultParameters = {
-	particleSize: 100,
-	orbit: 4,
-	velocity: 0.04,
-	attractionForce: 0.01,
-	xCoeff: 0.001,
-	yCoeff: 0.002,
-	zCoeff: 0.003,
-	paramsInUrl: true,
-}
+export const maxParticleSize = 100;
 
 export let parameters = {
 	particleSize: 5,
 	orbit: 4,
-	velocity: 0.04,
-	attractionForce: 0.01,
+	repulsion: 0.04,
+	attraction: 0.01,
+	pointerForce: 6,
+	pointerDistance: 100,
 	xCoeff: 0.001,
 	yCoeff: 0.002,
 	zCoeff: 0.003,
@@ -25,7 +18,7 @@ export let parameters = {
 
 // this should be exportable instead of importing the knobs array
 // that way if the EN16.js file is missing there won't be an error
-const parametersObjects = [];
+export const parametersObjects = [];
 
 const url = new URL(window.location.href);
 const queryString = window.location.search;
@@ -77,25 +70,38 @@ orbitParam.update = (value) => {
 };
 orbitParam.controller = noise3d.add(parameters, 'orbit', 1, 50).onChange(value => orbitParam.onChange(value));
 parametersObjects.push(orbitParam);
-knobs[0] = orbitParam;
 
-const velocityParam = new Param('velocity');
-velocityParam.update = (value) => {
-	parameters.velocity = value;
+const repulsionParam = new Param('repulsion');
+repulsionParam.update = (value) => {
+	parameters.repulsion = value;
 	return value;
 };
-velocityParam.controller = noise3d.add(parameters, 'velocity', .0001, 0.9).onChange(value => velocityParam.onChange(value));
-parametersObjects.push(velocityParam);
-knobs[1] = velocityParam;
+repulsionParam.controller = noise3d.add(parameters, 'repulsion', .0001, 0.9).onChange(value => repulsionParam.onChange(value));
+parametersObjects.push(repulsionParam);
 
-const attractionForceParam = new Param('attractionForce');
-attractionForceParam.update = (value) => {
-	parameters.attractionForce = value;
+const attractionParam = new Param('attraction');
+attractionParam.update = (value) => {
+	parameters.attraction = value;
 	return value;
 };
-attractionForceParam.controller = noise3d.add(parameters, 'attractionForce', .0001, 0.1).onChange(value => attractionForceParam.onChange(value));
-parametersObjects.push(attractionForceParam);
-knobs[2] = attractionForceParam;
+attractionParam.controller = noise3d.add(parameters, 'attraction', .0001, 0.1).onChange(value => attractionParam.onChange(value));
+parametersObjects.push(attractionParam);
+
+const pointerForceParam = new Param('pointerForce');
+pointerForceParam.update = (value) => {
+	parameters.pointerForce = value;
+	return value;
+};
+pointerForceParam.controller = noise3d.add(parameters, 'pointerForce', 0, 25).onChange(value => pointerForceParam.onChange(value));
+parametersObjects.push(pointerForceParam);
+
+const pointerDistanceParam = new Param('pointerDistance');
+pointerDistanceParam.update = (value) => {
+	parameters.pointerDistance = value;
+	return value;
+};
+pointerDistanceParam.controller = noise3d.add(parameters, 'pointerDistance', 25, 500).onChange(value => pointerDistanceParam.onChange(value));
+parametersObjects.push(pointerDistanceParam);
 
 const xCoeffParam = new Param('xCoeff');
 xCoeffParam.update = (value) => {
@@ -104,7 +110,6 @@ xCoeffParam.update = (value) => {
 };
 xCoeffParam.controller = noise3d.add(parameters, 'xCoeff', .000001, 0.01).onChange(value => xCoeffParam.onChange(value));
 parametersObjects.push(xCoeffParam);
-knobs[4] = xCoeffParam;
 
 const yCoeffParam = new Param('yCoeff');
 yCoeffParam.update = (value) => {
@@ -113,7 +118,6 @@ yCoeffParam.update = (value) => {
 };
 yCoeffParam.controller = noise3d.add(parameters, 'yCoeff', .000001, 0.01).onChange(value => yCoeffParam.onChange(value));
 parametersObjects.push(yCoeffParam);
-knobs[5] = yCoeffParam;
 
 const zCoeffParam = new Param('zCoeff');
 zCoeffParam.update = (value) => {
@@ -122,7 +126,6 @@ zCoeffParam.update = (value) => {
 };
 zCoeffParam.controller = noise3d.add(parameters, 'zCoeff', .000001, 0.01).onChange(value => zCoeffParam.onChange(value));
 parametersObjects.push(zCoeffParam);
-knobs[6] = zCoeffParam;
 
 /**
  * presets
@@ -134,8 +137,9 @@ const presetFunctions = {
 	cartoon_wind: () => {
 		parameters.particleSize = 5;
 		parameters.orbit = 20;
-		parameters.velocity = 0.0001
-		parameters.attractionForce = 0.016618897637795275;
+		parameters.repulsion = 0.0001
+		parameters.attraction = 0.016618897637795275;
+		parameters.pointerForce = 6;
 		parameters.xCoeff = 0.00047339370078740165;
 		parameters.yCoeff = 0.0018905748031496064;
 		parameters.zCoeff = 0.0008670551181102363;
@@ -144,15 +148,17 @@ const presetFunctions = {
 	lazy_bones: () => {
 		parameters.particleSize = 15;
 		parameters.orbit = 1;
-		parameters.velocity = 0.0001
-		parameters.attractionForce = 0.0001;
+		parameters.repulsion = 0.0001
+		parameters.attraction = 0.0001;
+		parameters.pointerForce = 6;
 		setAllParameters();
 	},
 	swarm: () => {
 		parameters.particleSize = 10;
 		parameters.orbit = 16;
-		parameters.velocity = 0.1630740157480315;
-		parameters.attractionForce = 0.01583228346456693;
+		parameters.repulsion = 0.1630740157480315;
+		parameters.attraction = 0.01583228346456693;
+		parameters.pointerForce = 6;
 		parameters.xCoeff = 0.01;
 		parameters.yCoeff = 0.01;
 		parameters.zCoeff = 0.01;
@@ -161,8 +167,9 @@ const presetFunctions = {
 	speedy_ball: () => {
 		parameters.particleSize = 10;
 		parameters.orbit = 40;
-		parameters.velocity = 0.0001;
-		parameters.attractionForce = 0.1;
+		parameters.repulsion = 0.0001;
+		parameters.attraction = 0.1;
+		parameters.pointerForce = 6;
 		parameters.xCoeff = 0.00047339370078740165;
 		parameters.yCoeff = 0.0011819842519685039;
 		parameters.zCoeff = 0.0011819842519685039;
@@ -171,8 +178,9 @@ const presetFunctions = {
 	eclipse: () => {
 		parameters.particleSize = 5;
 		parameters.orbit = 4;
-		parameters.velocity = 0.04;
-		parameters.attractionForce = 0.01;
+		parameters.repulsion = 0.04;
+		parameters.attraction = 0.01;
+		parameters.pointerForce = 6;
 		parameters.xCoeff = 0.0001;
 		parameters.yCoeff = 0.0001;
 		parameters.zCoeff = 0.0001;
@@ -181,24 +189,18 @@ const presetFunctions = {
 	reset: () => {
 		parameters.particleSize= 5;
 		parameters.orbit= 4;
-		parameters.velocity= 0.04;
-		parameters.attractionForce= 0.01;
+		parameters.repulsion= 0.04;
+		parameters.attraction = 0.01;
+		parameters.pointerForce = 6;
 		parameters.xCoeff= 0.001;
 		parameters.yCoeff= 0.002;
 		parameters.zCoeff= 0.003;
 		parameters.paramsInUrl= true;
 
-		// parameters = { ...defaultParameters, particleSize: 50 };
 		setAllParameters();
-
-		// const url = new URL(window.location.href);
-		// url.search = ''; // Clears all parameters
-		// window.history.replaceState({}, '', url.toString());
-		// window.location.reload();
 	}
 }
 
-// presets.add(presetFunctions, 'fastAndBig3dOrbit');
 presets.add(presetFunctions, 'cartoon_wind');
 presets.add(presetFunctions, 'swarm');
 presets.add(presetFunctions, 'speedy_ball');
@@ -230,7 +232,6 @@ const setURL = {
 }
 
 sharing.add(setURL, 'copyURLToClipboard');
-// sharing.add(setURL, 'reset');
 
 /**
  * 
@@ -242,8 +243,10 @@ export const initParameters = () => {
 	parameters.paramsInUrl = urlParams.get('paramsInUrl') !== null ? returnBinary(urlParams.get('paramsInUrl')) : parameters.paramsInUrl;
 	parameters.particleSize = urlParams.get('particleSize') !== null ? urlParams.get('particleSize') : parameters.particleSize;
 	parameters.orbit = urlParams.get('orbit') !== null ? urlParams.get('orbit') : parameters.orbit;
-	parameters.velocity = urlParams.get('velocity') !== null ? urlParams.get('velocity') : parameters.velocity;
-	parameters.attractionForce = urlParams.get('attractionForce') !== null ? urlParams.get('attractionForce') : parameters.attractionForce;
+	parameters.repulsion = urlParams.get('repulsion') !== null ? urlParams.get('repulsion') : parameters.repulsion;
+	parameters.attraction = urlParams.get('attraction') !== null ? urlParams.get('attraction') : parameters.attraction;
+	parameters.pointerForce = urlParams.get('pointerForce') !== null ? urlParams.get('pointerForce') : parameters.pointerForce;
+	parameters.pointerDistance = urlParams.get('pointerDistance') !== null ? urlParams.get('pointerDistance') : parameters.pointerDistance;
 	
 	parameters.xCoeff = urlParams.get('xCoeff') !== null ? urlParams.get('xCoeff') : parameters.xCoeff;
 	parameters.yCoeff = urlParams.get('yCoeff') !== null ? urlParams.get('yCoeff') : parameters.yCoeff;

@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { createNoise3D, createNoise2D } from 'simplex-noise';
 import Stats from 'stats.js';
-import { initParameters, parameters } from './parameters';
-import { returnSprite, returnTexture } from './sprites';
+import { initParameters, parameters, parametersObjects } from './parameters';
+import { returnTexture } from './sprites';
 
 const app = new PIXI.Application();
 const contentElem = document.getElementById('content');
@@ -21,7 +21,10 @@ const particleContainer = new PIXI.ParticleContainer({
 let phase = 0;
 let prevTime = 0;
 
-// const colors = ['#DBBEAB', '#789A9C', '#ABDADB', '#866D5C', '#305A5C', '#331F12'];
+let interactionPoints = [];
+const POINTER_COORDS = 0;
+interactionPoints[POINTER_COORDS] = null;
+
 const colors = ['#A4D2D3', '#8AB0B1', '#ABDADB', '#6F8E8F', '#556C6D', '#3A4B4B'];
 
 /**
@@ -37,9 +40,9 @@ const range2d = 400; // Total horizontal distance
 /**
  * 3d noise particles variables
  */
-const noise3D = createNoise3D();
+// const noise3D = createNoise3D();
 let particles3d = [];
-let totalparticles3d = 10000;
+let totalparticles3d = 5000;
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -51,14 +54,6 @@ const generateparticles = (total) => {
 		particles[i] = {};
 		particles[i].angle = 0;
 		particles[i].noise = createNoise3D();
-		// particles[i].sprite = new returnSprite(app, i);
-		// particles[i].sprite.anchor.set(.5, .5);
-		// particles[i].sprite.scale.set(parseInt(parameters.particleSize, 10) / 100);
-		// particles[i].sprite.x = window.innerWidth / 2;
-		// particles[i].sprite.y = window.innerHeight / 2;
-		// particles[i].sprite.x = Math.random() * window.innerWidth;
-		// particles[i].sprite.y = Math.random() * window.innerHeight;
-		// app.stage.addChild(particles[i].sprite);
 
 		particles[i].particle = new PIXI.Particle(returnTexture(app));
 		particles[i].particle.anchorX = 0.5;
@@ -94,17 +89,12 @@ const initMovement3d = () => {
 const movement3dStep = (deltaTime) => {
 	// move particle in a circle with a wobble
 	const xyCoeff = parameters.xyCoeff;
-	const attractionForce = parameters.attractionForce;
+	const attraction = parameters.attraction;
 
 	particles3d.forEach(particle => {
 
 		particle.particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
 		particle.particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
-
-		// console.log(particle.particle);
-
-		// particle.particle.scaleX = .5;
-		// particle.particle.scaleY = .5;
 
 		const noise = particle.noise(
 			particle.particle.x * parameters.xCoeff,
@@ -115,12 +105,29 @@ const movement3dStep = (deltaTime) => {
 		const velX = Math.cos(noise * Math.PI * 2) * parameters.orbit;
 		const velY = Math.sin(noise * Math.PI * 2) * parameters.orbit;
 
-		const attractionX = (midX - particle.particle.x) * (1 - parameters.velocity);
-		const attractionY = (midY - particle.particle.y) * (1 - parameters.velocity);
+		const attractionX = (midX - particle.particle.x) * (1 - parameters.repulsion);
+		const attractionY = (midY - particle.particle.y) * (1 - parameters.repulsion);
 
-		particle.particle.x += velX + attractionX * attractionForce;
-		particle.particle.y += velY + attractionY * attractionForce;
-		// phase += 0.00001;
+		let pointerXForce = 0;
+		let pointerYForce = 0;
+
+		if (interactionPoints[POINTER_COORDS] !== null) {
+			const distance = Math.hypot(particle.particle.x - interactionPoints[POINTER_COORDS].x, particle.particle.y - interactionPoints[POINTER_COORDS].y);
+
+			if (distance < parameters.pointerDistance) {
+
+				const dx = particle.particle.x - interactionPoints[POINTER_COORDS].x;
+				const dy = particle.particle.y - interactionPoints[POINTER_COORDS].y;
+
+				const force = parameters.pointerForce / distance * distance;
+
+				pointerXForce = force * (dx / distance);
+				pointerYForce = force * (dy / distance);
+			}
+		}
+
+		particle.particle.x += velX + attractionX * attraction + pointerXForce;
+		particle.particle.y += velY + attractionY * attraction + pointerYForce;
 	});
 }
 
@@ -160,17 +167,32 @@ const animate = (timestamp) => {
 	requestAnimationFrame(animate);
 }
 
-const handleClick = (event) => {
-	let eventX = event.clientX;
-	let eventY = event.clientY;
-	if (event.touches) {
-		eventX = event.touches[0].clientX;
-		eventY = event.touches[0].clientY;
-	}
-}
-
 const handleResize = (event) => {
 
+}
+
+const handleClick = (event) => {
+	// const { x, y } = getPointerCoords(event);
+}
+
+const handleMove = (event) => {
+	interactionPoints[POINTER_COORDS] = getPointerCoords(event);
+}
+
+const handleLeave = (event) => {
+	interactionPoints[POINTER_COORDS] = null;
+}
+
+const getPointerCoords = (event) => {
+	let x = event.clientX;
+	let y = event.clientY;
+
+	if (event.touches) {
+		x = event.touches[0].clientX;
+		y = event.touches[0].clientY;
+	}
+
+	return { x, y };
 }
 
 window.addEventListener('load', () => {
@@ -179,11 +201,18 @@ window.addEventListener('load', () => {
 	requestAnimationFrame(animate);
 });
 
-window.addEventListener('resize', () => { handleResize(); });
+window.addEventListener('mouseover', handleMove, false);
+window.addEventListener('mousemove', handleMove, false);
+window.addEventListener('touchmove', handleMove, false);
+
+window.addEventListener('mouseout', handleLeave, false);
+document.addEventListener('touchend', handleLeave, false);
+
+window.addEventListener('resize', handleResize, false);
 
 window.addEventListener('click', handleClick, false);
 document.addEventListener('touchstart', handleClick, false);
 
-const mapRange = (value, inMin, inMax, outMin, outMax) => {
-	return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
-};
+// const mapRange = (value, inMin, inMax, outMin, outMax) => {
+// 	return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+// };

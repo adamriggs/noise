@@ -5,8 +5,9 @@
 TODO
 
 * ✅particles
-* pointer avoidance
+* ✅pointer avoidance
 * option to oscillate parameter values
 * use HSL colors and experiment with parameters affecting colors
+* flow fields
 
 [View Here](https://adamriggs.github.io/noise/)

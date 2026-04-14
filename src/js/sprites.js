@@ -6,7 +6,7 @@ export const colors = ['#A4D2D3', '#8AB0B1', '#ABDADB', '#6F8E8F', '#556C6D', '#
 
 export const returnTexture = (app) => {
 	const gfx = new PIXI.Graphics();
-	gfx.circle(0, 0, defaultParameters.spriteSize / 2);
+	gfx.circle(0, 0, defaultParameters.particleSize / 2);
 	gfx.fill({ color: '#ffffff', alpha: 1 });
 	// gfx.stroke({
 	// 	alpha: 1,
@@ -31,7 +31,7 @@ export const returnSprite = (app, count) => {
 	}
 
 	const gfx = new PIXI.Graphics();
-	gfx.circle(0, 0, defaultParameters.spriteSize / 2);
+	gfx.circle(0, 0, defaultParameters.particleSize / 2);
 	gfx.fill({ color: colors[colorCounter % colors.length], alpha: 1 });
 	gfx.cacheAsTexture = true;
 

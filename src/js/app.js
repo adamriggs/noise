@@ -53,7 +53,7 @@ const generateparticles = (total) => {
 		particles[i].noise = createNoise3D();
 		// particles[i].sprite = new returnSprite(app, i);
 		// particles[i].sprite.anchor.set(.5, .5);
-		// particles[i].sprite.scale.set(parseInt(parameters.spriteSize, 10) / 100);
+		// particles[i].sprite.scale.set(parseInt(parameters.particleSize, 10) / 100);
 		// particles[i].sprite.x = window.innerWidth / 2;
 		// particles[i].sprite.y = window.innerHeight / 2;
 		// particles[i].sprite.x = Math.random() * window.innerWidth;
@@ -63,11 +63,13 @@ const generateparticles = (total) => {
 		particles[i].particle = new PIXI.Particle(returnTexture(app));
 		particles[i].particle.anchorX = 0.5;
 		particles[i].particle.anchorY = 0.5;
-		particles[i].particle.scaleX = parseInt(parameters.spriteSize, 10) / 100;
-		particles[i].particle.scaleY = parseInt(parameters.spriteSize, 10) / 100;
+		particles[i].particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
+		particles[i].particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
 		particles[i].particle.tint = colors[i % colors.length];
 		particles[i].particle.x = window.innerWidth / 2;
 		particles[i].particle.y = window.innerHeight / 2;
+		// particles[i].particle.x = Math.random() * window.innerWidth;
+		// particles[i].particle.y = Math.random() * window.innerHeight;
 		particleContainer.addParticle(particles[i].particle);
 	}
 	return particles;
@@ -96,8 +98,8 @@ const movement3dStep = (deltaTime) => {
 
 	particles3d.forEach(particle => {
 
-		particle.particle.scaleX = parseInt(parameters.spriteSize, 10) / 100;
-		particle.particle.scaleY = parseInt(parameters.spriteSize, 10) / 100;
+		particle.particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
+		particle.particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
 
 		// console.log(particle.particle);
 

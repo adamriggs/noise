@@ -2,7 +2,7 @@ import GUI from 'lil-gui';
 import { knobs } from './EN16';
 
 export const defaultParameters = {
-	spriteSize: 100,
+	particleSize: 100,
 	orbit: 4,
 	velocity: 0.04,
 	attractionForce: 0.01,
@@ -13,7 +13,7 @@ export const defaultParameters = {
 }
 
 export let parameters = {
-	spriteSize: 50,
+	particleSize: 5,
 	orbit: 4,
 	velocity: 0.04,
 	attractionForce: 0.01,
@@ -58,14 +58,14 @@ class Param {
 	}
 };
 
-const spriteSizeParam = new Param('spriteSize');
-spriteSizeParam.update = (value) => {
+const particleSizeParam = new Param('particleSize');
+particleSizeParam.update = (value) => {
 	value = Math.round(value);
-	parameters.spriteSize = value;
+	parameters.particleSize = value;
 	return value;
 };
-spriteSizeParam.controller = gui.add(parameters, 'spriteSize', 1, 100).onChange(value => spriteSizeParam.onChange(value));
-parametersObjects.push(spriteSizeParam);
+particleSizeParam.controller = gui.add(parameters, 'particleSize', 1, 100).onChange(value => particleSizeParam.onChange(value));
+parametersObjects.push(particleSizeParam);
 
 const noise3d = gui.addFolder('3dNoise');
 
@@ -132,7 +132,7 @@ const presets = gui.addFolder('Presets');
 
 const presetFunctions = {
 	cartoon_wind: () => {
-		parameters.spriteSize = 5;
+		parameters.particleSize = 5;
 		parameters.orbit = 20;
 		parameters.velocity = 0.0001
 		parameters.attractionForce = 0.016618897637795275;
@@ -142,14 +142,14 @@ const presetFunctions = {
 		setAllParameters();
 	},
 	lazy_bones: () => {
-		parameters.spriteSize = 15;
+		parameters.particleSize = 15;
 		parameters.orbit = 1;
 		parameters.velocity = 0.0001
 		parameters.attractionForce = 0.0001;
 		setAllParameters();
 	},
 	swarm: () => {
-		parameters.spriteSize = 10;
+		parameters.particleSize = 10;
 		parameters.orbit = 16;
 		parameters.velocity = 0.1630740157480315;
 		parameters.attractionForce = 0.01583228346456693;
@@ -159,7 +159,7 @@ const presetFunctions = {
 		setAllParameters();
 	},
 	speedy_ball: () => {
-		parameters.spriteSize = 10;
+		parameters.particleSize = 10;
 		parameters.orbit = 40;
 		parameters.velocity = 0.0001;
 		parameters.attractionForce = 0.1;
@@ -168,8 +168,18 @@ const presetFunctions = {
 		parameters.zCoeff = 0.0011819842519685039;
 		setAllParameters();
 	},
+	eclipse: () => {
+		parameters.particleSize = 5;
+		parameters.orbit = 4;
+		parameters.velocity = 0.04;
+		parameters.attractionForce = 0.01;
+		parameters.xCoeff = 0.0001;
+		parameters.yCoeff = 0.0001;
+		parameters.zCoeff = 0.0001;
+		setAllParameters();
+	},
 	reset: () => {
-		parameters.spriteSize= 50;
+		parameters.particleSize= 5;
 		parameters.orbit= 4;
 		parameters.velocity= 0.04;
 		parameters.attractionForce= 0.01;
@@ -178,7 +188,7 @@ const presetFunctions = {
 		parameters.zCoeff= 0.003;
 		parameters.paramsInUrl= true;
 
-		// parameters = { ...defaultParameters, spriteSize: 50 };
+		// parameters = { ...defaultParameters, particleSize: 50 };
 		setAllParameters();
 
 		// const url = new URL(window.location.href);
@@ -193,6 +203,7 @@ presets.add(presetFunctions, 'cartoon_wind');
 presets.add(presetFunctions, 'swarm');
 presets.add(presetFunctions, 'speedy_ball');
 presets.add(presetFunctions, 'lazy_bones');
+presets.add(presetFunctions, 'eclipse');
 presets.add(presetFunctions, 'reset');
 
 /**
@@ -229,7 +240,7 @@ sharing.add(setURL, 'copyURLToClipboard');
 
 export const initParameters = () => {
 	parameters.paramsInUrl = urlParams.get('paramsInUrl') !== null ? returnBinary(urlParams.get('paramsInUrl')) : parameters.paramsInUrl;
-	parameters.spriteSize = urlParams.get('spriteSize') !== null ? urlParams.get('spriteSize') : parameters.spriteSize;
+	parameters.particleSize = urlParams.get('particleSize') !== null ? urlParams.get('particleSize') : parameters.particleSize;
 	parameters.orbit = urlParams.get('orbit') !== null ? urlParams.get('orbit') : parameters.orbit;
 	parameters.velocity = urlParams.get('velocity') !== null ? urlParams.get('velocity') : parameters.velocity;
 	parameters.attractionForce = urlParams.get('attractionForce') !== null ? urlParams.get('attractionForce') : parameters.attractionForce;
@@ -237,7 +248,6 @@ export const initParameters = () => {
 	parameters.xCoeff = urlParams.get('xCoeff') !== null ? urlParams.get('xCoeff') : parameters.xCoeff;
 	parameters.yCoeff = urlParams.get('yCoeff') !== null ? urlParams.get('yCoeff') : parameters.yCoeff;
 	parameters.zCoeff = urlParams.get('zCoeff') !== null ? urlParams.get('zCoeff') : parameters.zCoeff;
-
 
 	setAllParameters();
 }

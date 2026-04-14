@@ -1,5 +1,5 @@
 import GUI from 'lil-gui';
-import { knobs } from './EN16';
+import './EN16';
 
 export const maxParticleSize = 100;
 
@@ -196,7 +196,8 @@ const presetFunctions = {
 		parameters.orbit= 4;
 		parameters.repulsion= 0.04;
 		parameters.attraction = 0.01;
-		parameters.pointerForce = 6;
+		parameters.pointerForce = 17;
+		parameters.pointerDistance = 100;
 		parameters.xCoeff= 0.001;
 		parameters.yCoeff= 0.002;
 		parameters.zCoeff= 0.003;

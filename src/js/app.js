@@ -26,6 +26,14 @@ const POINTER_COORDS = 0;
 interactionPoints[POINTER_COORDS] = null;
 
 const colors = ['#A4D2D3', '#8AB0B1', '#ABDADB', '#6F8E8F', '#556C6D', '#3A4B4B'];
+const colorsHSL = [
+	{ h: '181.28', s: '34.81', l: '73.53' },
+	{ h: '181.54', s: '20', l: '61.76' },
+	{ h: '181.25', s: '40', l: '76.47' },
+	{ h: '181.88', s: '12.6', l: '49.8' },
+	{ h: '182.5', s: '12.37', l: '38.04' },
+	{ h: '180', s: '12.78', l: '26.08' },
+];
 
 /**
  * 2d noise particles variables
@@ -52,7 +60,6 @@ const generateparticles = (total) => {
 	let particles = [];
 	for (let i = 0; i < total; i++) {
 		particles[i] = {};
-		particles[i].angle = 0;
 		particles[i].noise = createNoise3D();
 
 		particles[i].particle = new PIXI.Particle(returnTexture(app));
@@ -61,6 +68,7 @@ const generateparticles = (total) => {
 		particles[i].particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
 		particles[i].particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
 		particles[i].particle.tint = colors[i % colors.length];
+		particles[i].hsl = colorsHSL[i % colors.length];
 		particles[i].particle.x = window.innerWidth / 2;
 		particles[i].particle.y = window.innerHeight / 2;
 		// particles[i].particle.x = Math.random() * window.innerWidth;
@@ -87,10 +95,6 @@ const initMovement3d = () => {
 }
 
 const movement3dStep = (deltaTime) => {
-	// move particle in a circle with a wobble
-	const xyCoeff = parameters.xyCoeff;
-	const attraction = parameters.attraction;
-
 	particles3d.forEach(particle => {
 
 		particle.particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
@@ -126,8 +130,15 @@ const movement3dStep = (deltaTime) => {
 			}
 		}
 
-		particle.particle.x += velX + attractionX * attraction + pointerXForce;
-		particle.particle.y += velY + attractionY * attraction + pointerYForce;
+		const hue = particle.hsl.h;
+		// const saturation = (particle.hsl.s / 2) + Math.abs(pointerXForce * pointerYForce);
+		const saturation = particle.hsl.s;
+		const lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
+		const opacity = 100;
+
+		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
+		particle.particle.x += (velX + attractionX * parameters.attraction + pointerXForce) * deltaTime / 10;
+		particle.particle.y += (velY + attractionY * parameters.attraction + pointerYForce) * deltaTime / 10;
 	});
 }
 
@@ -213,6 +224,6 @@ window.addEventListener('resize', handleResize, false);
 window.addEventListener('click', handleClick, false);
 document.addEventListener('touchstart', handleClick, false);
 
-// const mapRange = (value, inMin, inMax, outMin, outMax) => {
-// 	return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
-// };
+const mapRange = (value, inMin, inMax, outMin, outMax) => {
+	return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+};

@@ -2,13 +2,21 @@ import * as PIXI from 'pixi.js';
 import { createNoise3D, createNoise2D } from 'simplex-noise';
 import Stats from 'stats.js';
 import { initParameters, parameters } from './parameters';
-import { returnSprite } from './sprites';
+import { returnSprite, returnTexture } from './sprites';
 
 const app = new PIXI.Application();
 const contentElem = document.getElementById('content');
 const backgroundColor = '#3A4B4B';	// 0xABDADC.  746D69. 353E43. 2A3439
 let midX = window.innerWidth / 2;
 let midY = window.innerHeight / 2;
+const particleContainer = new PIXI.ParticleContainer({
+	dynamicProperties: {
+		position: true, // default
+		vertex: false,
+		rotation: false,
+		color: false,
+	},
+});
 
 let phase = 0;
 let prevTime = 0;
@@ -43,14 +51,24 @@ const generateparticles = (total) => {
 		particles[i] = {};
 		particles[i].angle = 0;
 		particles[i].noise = createNoise3D();
-		particles[i].sprite = new returnSprite(app, i);
-		particles[i].sprite.anchor.set(.5, .5);
-		particles[i].sprite.scale.set(parseInt(parameters.spriteSize, 10) / 100);
-		particles[i].sprite.x = window.innerWidth / 2;
-		particles[i].sprite.y = window.innerHeight / 2;
+		// particles[i].sprite = new returnSprite(app, i);
+		// particles[i].sprite.anchor.set(.5, .5);
+		// particles[i].sprite.scale.set(parseInt(parameters.spriteSize, 10) / 100);
+		// particles[i].sprite.x = window.innerWidth / 2;
+		// particles[i].sprite.y = window.innerHeight / 2;
 		// particles[i].sprite.x = Math.random() * window.innerWidth;
 		// particles[i].sprite.y = Math.random() * window.innerHeight;
-		app.stage.addChild(particles[i].sprite);
+		// app.stage.addChild(particles[i].sprite);
+
+		particles[i].particle = new PIXI.Particle(returnTexture(app));
+		particles[i].particle.anchorX = 0.5;
+		particles[i].particle.anchorY = 0.5;
+		particles[i].particle.scaleX = parseInt(parameters.spriteSize, 10) / 100;
+		particles[i].particle.scaleY = parseInt(parameters.spriteSize, 10) / 100;
+		particles[i].particle.tint = colors[i % colors.length];
+		particles[i].particle.x = window.innerWidth / 2;
+		particles[i].particle.y = window.innerHeight / 2;
+		particleContainer.addParticle(particles[i].particle);
 	}
 	return particles;
 }
@@ -63,8 +81,8 @@ const movement2dStep = () => {
 	// move particle in a line with a wiggle
 	time2d += speed2d;
 	const noiseValue = noise2D(time2d, Math.random() / 1000);
-	particles2d[0].sprite.x = midX + (noiseValue * range2d * 0.5);
-	particles2d[0].sprite.y = midY + (midY / 2);
+	particles2d[0].particle.x = midX + (noiseValue * range2d * 0.5);
+	particles2d[0].particle.y = midY + (midY / 2);
 }
 
 const initMovement3d = () => {
@@ -77,21 +95,29 @@ const movement3dStep = (deltaTime) => {
 	const attractionForce = parameters.attractionForce;
 
 	particles3d.forEach(particle => {
-		// if (particle === particles3d[0]) { return; }	
 
-		particle.sprite.scale.set(parseInt(parameters.spriteSize, 10) / 100);
+		particle.particle.scaleX = parseInt(parameters.spriteSize, 10) / 100;
+		particle.particle.scaleY = parseInt(parameters.spriteSize, 10) / 100;
 
-		// const noise = particle.noise(particle.sprite.x * xyCoeff, particle.sprite.y * parameters.xyCoeff, phase);
-		const noise = particle.noise(particle.sprite.x * parameters.xCoeff, particle.sprite.y * parameters.yCoeff, phase * parameters.zCoeff * 1000);
+		// console.log(particle.particle);
+
+		// particle.particle.scaleX = .5;
+		// particle.particle.scaleY = .5;
+
+		const noise = particle.noise(
+			particle.particle.x * parameters.xCoeff,
+			particle.particle.y * parameters.yCoeff,
+			phase * parameters.zCoeff * 1000
+		);
 
 		const velX = Math.cos(noise * Math.PI * 2) * parameters.orbit;
 		const velY = Math.sin(noise * Math.PI * 2) * parameters.orbit;
 
-		const attractionX = (midX - particle.sprite.x) * (1 - parameters.velocity);
-		const attractionY = (midY - particle.sprite.y) * (1 - parameters.velocity);
+		const attractionX = (midX - particle.particle.x) * (1 - parameters.velocity);
+		const attractionY = (midY - particle.particle.y) * (1 - parameters.velocity);
 
-		particle.sprite.x += velX + attractionX * attractionForce;
-		particle.sprite.y += velY + attractionY * attractionForce;
+		particle.particle.x += velX + attractionX * attractionForce;
+		particle.particle.y += velY + attractionY * attractionForce;
 		// phase += 0.00001;
 	});
 }
@@ -106,6 +132,8 @@ const initApp = async () => {
 
 	contentElem.appendChild(app.canvas);
 
+	app.stage.addChild(particleContainer);
+
 	initParameters();
 	// initMovement2d();
 	initMovement3d();
@@ -118,6 +146,8 @@ const animate = (timestamp) => {
 	}
 	const deltaTime = timestamp - prevTime;
 	prevTime = timestamp;
+
+	particleContainer.update();
 
 	phase += 0.001;
 

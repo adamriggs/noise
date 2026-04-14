@@ -4,6 +4,7 @@
 
 TODO
 
+* ✅particles
 * pointer avoidance
 * option to oscillate parameter values
 * use HSL colors and experiment with parameters affecting colors

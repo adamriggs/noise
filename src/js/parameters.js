@@ -139,18 +139,11 @@ const presetFunctions = {
 		parameters.orbit = 20;
 		parameters.repulsion = 0.0001
 		parameters.attraction = 0.016618897637795275;
-		parameters.pointerForce = 6;
+		parameters.pointerForce = 25;
+		parameters.pointerDistance = 300;
 		parameters.xCoeff = 0.00047339370078740165;
 		parameters.yCoeff = 0.0018905748031496064;
 		parameters.zCoeff = 0.0008670551181102363;
-		setAllParameters();
-	},
-	lazy_bones: () => {
-		parameters.particleSize = 15;
-		parameters.orbit = 1;
-		parameters.repulsion = 0.0001
-		parameters.attraction = 0.0001;
-		parameters.pointerForce = 6;
 		setAllParameters();
 	},
 	swarm: () => {
@@ -158,7 +151,8 @@ const presetFunctions = {
 		parameters.orbit = 16;
 		parameters.repulsion = 0.1630740157480315;
 		parameters.attraction = 0.01583228346456693;
-		parameters.pointerForce = 6;
+		parameters.pointerForce = 25;
+		parameters.pointerDistance = 200;
 		parameters.xCoeff = 0.01;
 		parameters.yCoeff = 0.01;
 		parameters.zCoeff = 0.01;
@@ -169,10 +163,20 @@ const presetFunctions = {
 		parameters.orbit = 40;
 		parameters.repulsion = 0.0001;
 		parameters.attraction = 0.1;
-		parameters.pointerForce = 6;
+		parameters.pointerForce = 15;
+		parameters.pointerDistance = 300;
 		parameters.xCoeff = 0.00047339370078740165;
 		parameters.yCoeff = 0.0011819842519685039;
 		parameters.zCoeff = 0.0011819842519685039;
+		setAllParameters();
+	},
+	lazy_bones: () => {
+		parameters.particleSize = 15;
+		parameters.orbit = 1;
+		parameters.repulsion = 0.0001
+		parameters.attraction = 0.0001;
+		parameters.pointerForce = 3;
+		parameters.pointerDistance = 300;
 		setAllParameters();
 	},
 	eclipse: () => {
@@ -180,7 +184,8 @@ const presetFunctions = {
 		parameters.orbit = 4;
 		parameters.repulsion = 0.04;
 		parameters.attraction = 0.01;
-		parameters.pointerForce = 6;
+		parameters.pointerForce = 3;
+		parameters.pointerDistance = 100;
 		parameters.xCoeff = 0.0001;
 		parameters.yCoeff = 0.0001;
 		parameters.zCoeff = 0.0001;

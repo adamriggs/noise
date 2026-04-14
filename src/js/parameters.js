@@ -8,7 +8,7 @@ export let parameters = {
 	orbit: 4,
 	repulsion: 0.04,
 	attraction: 0.01,
-	pointerForce: 6,
+	pointerForce: 17,
 	pointerDistance: 100,
 	xCoeff: 0.001,
 	yCoeff: 0.002,
@@ -163,7 +163,7 @@ const presetFunctions = {
 		parameters.orbit = 40;
 		parameters.repulsion = 0.0001;
 		parameters.attraction = 0.1;
-		parameters.pointerForce = 15;
+		parameters.pointerForce = 22;
 		parameters.pointerDistance = 300;
 		parameters.xCoeff = 0.00047339370078740165;
 		parameters.yCoeff = 0.0011819842519685039;
@@ -184,7 +184,7 @@ const presetFunctions = {
 		parameters.orbit = 4;
 		parameters.repulsion = 0.04;
 		parameters.attraction = 0.01;
-		parameters.pointerForce = 3;
+		parameters.pointerForce = 15;
 		parameters.pointerDistance = 100;
 		parameters.xCoeff = 0.0001;
 		parameters.yCoeff = 0.0001;

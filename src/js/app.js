@@ -62,6 +62,7 @@ const generateparticles = (total) => {
 	for (let i = 0; i < total; i++) {
 		particles[i] = {};
 		particles[i].noise = createNoise3D();
+		particles[i].decayCounter = 0;
 
 		particles[i].particle = new PIXI.Particle(returnTexture(app));
 		particles[i].particle.anchorX = 0.5;
@@ -131,12 +132,25 @@ const movement3dStep = (deltaTime) => {
 			}
 		}
 
-		const hue = particle.hsl.h * parameters.hCoeff;
-		const saturation = particle.hsl.s * parameters.sCoeff;
-		const lightness = particle.hsl.l * parameters.lCoeff;
-		// const saturation = (particle.hsl.s / 2) + Math.abs(pointerXForce * pointerYForce);
-		// const saturation = parseInt(particle.hsl.s, 10) + Math.abs(pointerXForce * pointerYForce);;
-		// const lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
+		let colorDecay = .5;
+		
+		if (pointerXForce * pointerYForce !== 0) {
+			particle.decayCounter = 500;	// half second
+		}
+
+		if (particle.decayCounter > 0) {
+			colorDecay = 1;	// using decayCounter as a percentage to add to .5 isn't as dramatic as I would have hoped
+			particle.decayCounter -= deltaTime;
+
+
+			if (particle.decayCounter < 0) {
+				particle.decayCounter = 0;
+			}
+		}
+
+		const hue = (particle.hsl.h * colorDecay) * parameters.hCoeff;
+		const saturation = (particle.hsl.s * colorDecay) * parameters.sCoeff;
+		const lightness = (particle.hsl.l) * parameters.lCoeff + Math.abs(pointerXForce * pointerYForce);
 		const opacity = 100;
 
 		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
@@ -241,18 +255,8 @@ document.addEventListener('touchstart', handleClick, false);
 
 document.addEventListener('visibilitychange', () => {
 	if (document.hidden) {
-		console.log("Tab is hidden (user switched tabs or minimized)");
 		stopAnimation();
-		// canvas.addEventListener("click", () => {
-		// 	if (rafId) {
-		// 		cancelAnimationFrame(rafId);
-		// 		rafId = null;
-		// 	} else {
-		// 		loop();
-		// 	}
-		// });
 	} else {
-		console.log("Tab is visible again");
 		startAnimation();
 	}
 });

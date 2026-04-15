@@ -218,6 +218,19 @@ const presetFunctions = {
 		parameters.zCoeff = 0.0001;
 		setAllParameters();
 	},
+	orbit: () => {
+		parameters.particleSize = 5;
+		parameters.orbit = 4;
+		parameters.repulsion = 0.04;
+		parameters.attraction = 0.01;
+		parameters.pointerForce = 17;
+		parameters.pointerDistance = 100;
+		parameters.xCoeff = 0.001;
+		parameters.yCoeff = 0.01;
+		parameters.zCoeff = 0.003;
+		parameters.paramsInUrl = true;
+		setAllParameters();
+	},
 	reset: () => {
 		parameters.particleSize= 5;
 		parameters.orbit= 4;
@@ -229,7 +242,6 @@ const presetFunctions = {
 		parameters.yCoeff= 0.002;
 		parameters.zCoeff= 0.003;
 		parameters.paramsInUrl= true;
-
 		setAllParameters();
 	}
 }
@@ -239,6 +251,7 @@ presets.add(presetFunctions, 'swarm');
 presets.add(presetFunctions, 'speedy_ball');
 presets.add(presetFunctions, 'lazy_bones');
 presets.add(presetFunctions, 'eclipse');
+presets.add(presetFunctions, 'orbit');
 presets.add(presetFunctions, 'reset');
 
 /**

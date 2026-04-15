@@ -14,6 +14,9 @@ export let parameters = {
 	yCoeff: 0.002,
 	zCoeff: 0.003,
 	paramsInUrl: true,
+	hCoeff: 1,
+	sCoeff: 1,
+	lCoeff: 1,
 };
 
 // this should be exportable instead of importing the knobs array
@@ -126,6 +129,30 @@ zCoeffParam.update = (value) => {
 };
 zCoeffParam.controller = noise3d.add(parameters, 'zCoeff', .000001, 0.01).onChange(value => zCoeffParam.onChange(value));
 parametersObjects.push(zCoeffParam);
+
+const hCoeffParam = new Param('hCoeff');
+hCoeffParam.update = (value) => {
+	parameters.hCoeff = value;
+	return value;
+};
+hCoeffParam.controller = noise3d.add(parameters, 'hCoeff', 0.01, 0.99).onChange(value => hCoeffParam.onChange(value));
+parametersObjects.push(hCoeffParam);
+
+const sCoeffParam = new Param('sCoeff');
+sCoeffParam.update = (value) => {
+	parameters.sCoeff = value;
+	return value;
+};
+sCoeffParam.controller = noise3d.add(parameters, 'sCoeff', 0.01, 0.99).onChange(value => sCoeffParam.onChange(value));
+parametersObjects.push(sCoeffParam);
+
+const lCoeffParam = new Param('lCoeff');
+lCoeffParam.update = (value) => {
+	parameters.lCoeff = value;
+	return value;
+};
+lCoeffParam.controller = noise3d.add(parameters, 'lCoeff', 0.01, 0.99).onChange(value => lCoeffParam.onChange(value));
+parametersObjects.push(lCoeffParam);
 
 /**
  * presets
@@ -257,6 +284,10 @@ export const initParameters = () => {
 	parameters.xCoeff = urlParams.get('xCoeff') !== null ? urlParams.get('xCoeff') : parameters.xCoeff;
 	parameters.yCoeff = urlParams.get('yCoeff') !== null ? urlParams.get('yCoeff') : parameters.yCoeff;
 	parameters.zCoeff = urlParams.get('zCoeff') !== null ? urlParams.get('zCoeff') : parameters.zCoeff;
+
+	parameters.hCoeff = urlParams.get('hCoeff') !== null ? urlParams.get('hCoeff') : parameters.hCoeff;
+	parameters.sCoeff = urlParams.get('sCoeff') !== null ? urlParams.get('sCoeff') : parameters.sCoeff;
+	parameters.lCoeff = urlParams.get('lCoeff') !== null ? urlParams.get('lCoeff') : parameters.lCoeff;
 
 	setAllParameters();
 }

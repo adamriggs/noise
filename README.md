@@ -10,6 +10,6 @@ TODO
 * option to oscillate parameter values
 * ✅use HSL colors and experiment with parameters affecting colors
 * flow fields
-* stop raf when tab looses focus and set deltaTime to current time on resume to prevent weirdness
+* ✅stop raf when tab looses focus and set deltaTime to current time on resume to prevent weirdness
 
 [View Here](https://adamriggs.github.io/noise/)

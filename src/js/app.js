@@ -20,6 +20,7 @@ const particleContainer = new PIXI.ParticleContainer({
 
 let phase = 0;
 let prevTime = 0;
+let rafId = null;	// id that request animation frame returns
 
 let interactionPoints = [];
 const POINTER_COORDS = 0;
@@ -130,10 +131,12 @@ const movement3dStep = (deltaTime) => {
 			}
 		}
 
-		const hue = particle.hsl.h;
+		const hue = particle.hsl.h * parameters.hCoeff;
+		const saturation = particle.hsl.s * parameters.sCoeff;
+		const lightness = particle.hsl.l * parameters.lCoeff;
 		// const saturation = (particle.hsl.s / 2) + Math.abs(pointerXForce * pointerYForce);
-		const saturation = parseInt(particle.hsl.s, 10) + Math.abs(pointerXForce * pointerYForce);;
-		const lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
+		// const saturation = parseInt(particle.hsl.s, 10) + Math.abs(pointerXForce * pointerYForce);;
+		// const lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
 		const opacity = 100;
 
 		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
@@ -206,10 +209,22 @@ const getPointerCoords = (event) => {
 	return { x, y };
 }
 
+const startAnimation = () => {
+	prevTime = performance.now();
+	rafId = requestAnimationFrame(animate);
+}
+
+const stopAnimation = () => {
+	if (rafId) {
+		cancelAnimationFrame(rafId);
+		rafId = null;
+	} 
+}
+
 window.addEventListener('load', () => {
 	initApp();
 
-	requestAnimationFrame(animate);
+	startAnimation();
 });
 
 window.addEventListener('mouseover', handleMove, false);
@@ -223,6 +238,25 @@ window.addEventListener('resize', handleResize, false);
 
 window.addEventListener('click', handleClick, false);
 document.addEventListener('touchstart', handleClick, false);
+
+document.addEventListener('visibilitychange', () => {
+	if (document.hidden) {
+		console.log("Tab is hidden (user switched tabs or minimized)");
+		stopAnimation();
+		// canvas.addEventListener("click", () => {
+		// 	if (rafId) {
+		// 		cancelAnimationFrame(rafId);
+		// 		rafId = null;
+		// 	} else {
+		// 		loop();
+		// 	}
+		// });
+	} else {
+		console.log("Tab is visible again");
+		startAnimation();
+	}
+});
+
 
 const mapRange = (value, inMin, inMax, outMin, outMax) => {
 	return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;

@@ -7,16 +7,10 @@ import { returnTexture } from './sprites';
 const app = new PIXI.Application();
 const contentElem = document.getElementById('content');
 const backgroundColor = '#3A4B4B';	// 0xABDADC.  746D69. 353E43. 2A3439
-let midX = window.innerWidth / 2;
-let midY = window.innerHeight / 2;
-const particleContainer = new PIXI.ParticleContainer({
-	dynamicProperties: {
-		position: true, // default
-		vertex: false,
-		rotation: false,
-		color: false,
-	},
-});
+let w = window.innerWidth;
+let h = window.innerHeight;
+let midX = w/ 2;
+let midY = h / 2;
 
 let phase = 0;
 let prevTime = 0;
@@ -37,63 +31,91 @@ const colorsHSL = [
 ];
 
 /**
- * 2d noise particles variables
- */
-const noise2D = createNoise2D();
-let particles2d = [];
-let totalparticles2d = 1;
-let time2d = 0;
-const speed2d = 0.005; // Lower is smoother
-const range2d = 400; // Total horizontal distance
-
-/**
  * 3d noise particles variables
  */
 // const noise3D = createNoise3D();
 let particles3d = [];
-let totalparticles3d = 5000;
+let totalParticles3d = 5000;
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
-const generateparticles = (total) => {
+const particles3dContainer = new PIXI.ParticleContainer({
+	dynamicProperties: {
+		position: true, // default
+		vertex: false,
+		rotation: false,
+		color: false,
+	},
+});
+
+/**
+ * flow field variables
+ */
+let particlesField = [];
+const totalParticlesField = 1000;
+const noise = createNoise3D();
+let colorPhase = 0;
+
+const particlesFieldContainer = new PIXI.ParticleContainer({
+	dynamicProperties: {
+		position: true, // default
+		vertex: false,
+		rotation: false,
+		color: false,
+	},
+});
+
+const fieldTrailTexture = PIXI.RenderTexture.create({
+	width: w,
+	height: w
+});
+
+const fieldTrailSprite = new PIXI.Sprite(fieldTrailTexture);
+
+/**
+ * MAIN FUNCTIONS
+ */
+
+const generateparticles = (total, container) => {
 	let particles = [];
 	for (let i = 0; i < total; i++) {
-		particles[i] = {};
-		particles[i].noise = createNoise3D();
-		particles[i].decayCounter = 0;
+		const particle = {};
+		particle.noise = createNoise3D();
+		particle.decayCounter = 0;
 
-		particles[i].particle = new PIXI.Particle(returnTexture(app));
-		particles[i].particle.anchorX = 0.5;
-		particles[i].particle.anchorY = 0.5;
-		particles[i].particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
-		particles[i].particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
-		particles[i].particle.tint = colors[i % colors.length];
-		particles[i].hsl = colorsHSL[i % colors.length];
-		particles[i].particle.x = window.innerWidth / 2;
-		particles[i].particle.y = window.innerHeight / 2;
-		// particles[i].particle.x = Math.random() * window.innerWidth;
-		// particles[i].particle.y = Math.random() * window.innerHeight;
-		particleContainer.addParticle(particles[i].particle);
+		particle.particle = new PIXI.Particle(returnTexture(app));
+		particle.particle.anchorX = 0.5;
+		particle.particle.anchorY = 0.5;
+		particle.particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
+		particle.particle.scaleY = parseInt(parameters.particleSize, 10) / 100;
+		particle.particle.tint = colors[i % colors.length];
+		particle.hsl = colorsHSL[i % colors.length];
+		particle.particle.x = w / 2;
+		particle.particle.y = h / 2;
+		// particle.particle.x = Math.random() * w;
+		// particle.particle.y = Math.random() * h;
+
+		particle.field = {
+			x: Math.random() * w,
+			y: Math.random() * h,
+			velocity: 1 + Math.random(),
+			opacity: 1,
+			angle: 0,
+			distance: 0,
+		}
+
+		// console.log(particle.field.x, particle.field.y);
+
+		particles[i] = particle;
+		container.addParticle(particles[i].particle);
 	}
 	return particles;
 }
 
-const initMovement2d = () => {
-	particles2d = generateparticles(totalparticles2d);
-}
-
-const movement2dStep = () => {
-	// move particle in a line with a wiggle
-	time2d += speed2d;
-	const noiseValue = noise2D(time2d, Math.random() / 1000);
-	particles2d[0].particle.x = midX + (noiseValue * range2d * 0.5);
-	particles2d[0].particle.y = midY + (midY / 2);
-}
-
 const initMovement3d = () => {
-	particles3d = generateparticles(totalparticles3d);
+	particles3d = generateparticles(totalParticles3d, particles3dContainer);
 }
 
 const movement3dStep = (deltaTime) => {
@@ -135,7 +157,7 @@ const movement3dStep = (deltaTime) => {
 		let colorDecay = .5;
 		
 		if (pointerXForce * pointerYForce !== 0) {
-			particle.decayCounter = 500;	// half second
+			particle.decayCounter = 50;
 		}
 
 		if (particle.decayCounter > 0) {
@@ -151,13 +173,88 @@ const movement3dStep = (deltaTime) => {
 		const hue = (particle.hsl.h * colorDecay) * parameters.hCoeff;
 		const saturation = (particle.hsl.s * colorDecay) * parameters.sCoeff;
 		const lightness = (particle.hsl.l) * parameters.lCoeff + Math.abs(pointerXForce * pointerYForce);
-		const opacity = 100;
+		const opacity = 1; // this isn't set here but I keep it here just to keep the formatting of the next line
 
 		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
-		particle.particle.x += (velX + attractionX * parameters.attraction + pointerXForce) * deltaTime / 10;
-		particle.particle.y += (velY + attractionY * parameters.attraction + pointerYForce) * deltaTime / 10;
+		particle.particle.x += (velX + attractionX * parameters.attraction + pointerXForce) * deltaTime;
+		particle.particle.y += (velY + attractionY * parameters.attraction + pointerYForce) * deltaTime;
 	});
 }
+
+const initFlowField = () => {
+	particlesField = generateparticles(totalParticlesField, particlesFieldContainer);
+
+}
+
+const flowFieldStep = (deltaTime) => {
+	const xScale = 0.003;
+	const yScale = 0.003;
+	const maxDistance = 200;
+
+	particlesField.forEach(particle => {
+
+		const noiseValue = noise(particle.field.x * xScale, particle.field.y * yScale, phase);
+		const angle = noiseValue * Math.PI * 2;
+
+		const xVal = Math.cos(angle) * particle.field.velocity;
+		const yVal = Math.sin(angle) * particle.field.velocity;
+
+		particle.field.x += xVal * deltaTime / 1;
+		particle.field.y += yVal * deltaTime / 1;
+
+		const distance = Math.hypot(midX - particle.field.x, midY - particle.field.y);
+		particle.distancePercentage = Math.min(distance / maxDistance, 1);
+
+		particle.angle = angle;
+
+		if (particle.field.x > w) {
+			particle.field.x = 0;
+		}
+
+		if (particle.field.x < 0) {
+			particle.field.x = w;
+		}
+
+		if (particle.field.y > h) {
+			particle.field.y = 0;
+		}
+
+		if (particle.field.y < 0) {
+			particle.field.y = h;
+		}
+
+		// const colorAngle = Math.cos(colorPhase + (particle.angle * 0.5));
+		// const colorAngleMapped = mapRange(colorAngle, -1, 1, 0, 1);
+
+
+		const hue = Math.abs(parseInt(particle.hsl.h, 10) + (25 * (particle.distancePercentage)));
+		// const hue = parseInt(particle.hsl.h, 10);
+		// const hue = 1;
+		// const saturation = 50 - (20 * (particle.distancePercentage));
+		const saturation = Math.min(Math.abs(parseInt(particle.hsl.s, 10) - (20 * (particle.distancePercentage))));
+		// const saturation = 100;
+		// const lightness = 50 - (10 * (particle.distancePercentage));
+		const lightness = Math.min(Math.abs(parseInt(particle.hsl.l, 10) - (20 * (particle.distancePercentage))));
+		// const lightness = 100;
+		// const opacity = 0.25 - (0.1 * (particle.distancePercentage));
+		const opacity = .4;
+
+		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
+
+		particle.particle.x = particle.field.x;
+		particle.particle.y = particle.field.y;
+		particle.particle.alpha = opacity;
+
+		// console.log(particle.field.x, particle.particle.y);
+		// console.log(hue, saturation, lightness, opacity);
+		// console.log(particle.hsl);
+		// console.log('*****');
+	});
+}
+
+/**
+ * INIT AND ANIMATE
+ */
 
 const initApp = async () => {
 	await app.init({
@@ -169,10 +266,14 @@ const initApp = async () => {
 
 	contentElem.appendChild(app.canvas);
 
-	app.stage.addChild(particleContainer);
+	app.stage.addChild(particlesFieldContainer);
+	app.stage.addChild(fieldTrailSprite);
+	app.stage.addChild(particles3dContainer);
+
+	fieldTrailSprite.alpha = .10;
 
 	initParameters();
-	// initMovement2d();
+	initFlowField();
 	initMovement3d();
 }
 
@@ -184,19 +285,48 @@ const animate = (timestamp) => {
 	const deltaTime = timestamp - prevTime;
 	prevTime = timestamp;
 
-	particleContainer.update();
+	particles3dContainer.update();
+	// particlesFieldContainer.update();
 
 	phase += 0.001;
+	colorPhase += 0.002;
 
-	// movement2dStep();
-	movement3dStep(deltaTime);
+	const animationCoeff = 100 * Math.pow(.87, (101 - parameters.animationSpeed));	// This is fairly arbitrary to make 50 feel like the right speed
+	
+	movement3dStep(deltaTime * animationCoeff);
+	flowFieldStep(deltaTime * animationCoeff);
+
+	app.renderer.render({
+		container: particlesFieldContainer,
+		target: fieldTrailTexture,
+		clear: false,
+		preserveDrawingBuffer: true,
+		skipUpdateTransform: false
+	});
 
 	stats.end();
 	requestAnimationFrame(animate);
 }
 
-const handleResize = (event) => {
+/**
+ * EVENT STUFF
+ */
 
+const getPointerCoords = (event) => {
+	let x = event.clientX;
+	let y = event.clientY;
+
+	if (event.touches) {
+		x = event.touches[0].clientX;
+		y = event.touches[0].clientY;
+	}
+
+	return { x, y };
+}
+
+const handleResize = (event) => {
+	w = window.innerWidth;
+	h = window.innerHeight;
 }
 
 const handleClick = (event) => {
@@ -211,18 +341,6 @@ const handleLeave = (event) => {
 	interactionPoints[POINTER_COORDS] = null;
 }
 
-const getPointerCoords = (event) => {
-	let x = event.clientX;
-	let y = event.clientY;
-
-	if (event.touches) {
-		x = event.touches[0].clientX;
-		y = event.touches[0].clientY;
-	}
-
-	return { x, y };
-}
-
 const startAnimation = () => {
 	prevTime = performance.now();
 	rafId = requestAnimationFrame(animate);
@@ -233,6 +351,14 @@ const stopAnimation = () => {
 		cancelAnimationFrame(rafId);
 		rafId = null;
 	} 
+}
+
+const visibilityChange = () => {
+	if (document.hidden) {
+		stopAnimation();
+	} else {
+		startAnimation();
+	}
 }
 
 window.addEventListener('load', () => {
@@ -253,13 +379,9 @@ window.addEventListener('resize', handleResize, false);
 window.addEventListener('click', handleClick, false);
 document.addEventListener('touchstart', handleClick, false);
 
-document.addEventListener('visibilitychange', () => {
-	if (document.hidden) {
-		stopAnimation();
-	} else {
-		startAnimation();
-	}
-});
+document.addEventListener("pagehide", visibilityChange, false);
+document.addEventListener("pageshow", visibilityChange, false);
+document.addEventListener('visibilitychange', visibilityChange, false);
 
 
 const mapRange = (value, inMin, inMax, outMin, outMax) => {

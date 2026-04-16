@@ -62,4 +62,12 @@ const mapRange = (value, inMin, inMax, outMin, outMax) => {
 
 window.addEventListener('load', () => {
 	navigator.requestMIDIAccess().then(onMIDISuccess);
+
+	const lilControls = Array.from(document.querySelectorAll('.lil-has-slider .lil-name'));
+
+	lilControls.forEach((name, i) => {
+		if ((i+1) % 4 === 0) {
+			name.classList.add('midi-row-end');
+		}
+	})
 });

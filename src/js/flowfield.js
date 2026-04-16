@@ -36,7 +36,7 @@ const generate = () => {
 	}));
 }
 
-let particles = generate();
+let particles = generate();	// what?
 
 const update = (particle, phase) => {
 	const scale = 0.003;

@@ -5,6 +5,7 @@ export const maxParticleSize = 100;
 
 export let parameters = {
 	particleSize: 5,
+	animationSpeed: 50,
 	orbit: 4,
 	repulsion: 0.04,
 	attraction: 0.01,
@@ -62,6 +63,15 @@ particleSizeParam.update = (value) => {
 };
 particleSizeParam.controller = gui.add(parameters, 'particleSize', 1, 100).onChange(value => particleSizeParam.onChange(value));
 parametersObjects.push(particleSizeParam);
+
+const animationSpeedParam = new Param('animationSpeed');
+animationSpeedParam.update = (value) => {
+	value = Math.round(value);
+	parameters.animationSpeed = value;
+	return value;
+};
+animationSpeedParam.controller = gui.add(parameters, 'animationSpeed', 1, 100).onChange(value => animationSpeedParam.onChange(value));
+parametersObjects.push(animationSpeedParam);
 
 const noise3d = gui.addFolder('3dNoise');
 
@@ -163,6 +173,7 @@ const presets = gui.addFolder('Presets');
 const presetFunctions = {
 	cartoon_wind: () => {
 		parameters.particleSize = 5;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 20;
 		parameters.repulsion = 0.0001
 		parameters.attraction = 0.016618897637795275;
@@ -175,6 +186,7 @@ const presetFunctions = {
 	},
 	swarm: () => {
 		parameters.particleSize = 10;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 16;
 		parameters.repulsion = 0.1630740157480315;
 		parameters.attraction = 0.01583228346456693;
@@ -187,6 +199,7 @@ const presetFunctions = {
 	},
 	speedy_ball: () => {
 		parameters.particleSize = 10;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 40;
 		parameters.repulsion = 0.0001;
 		parameters.attraction = 0.1;
@@ -199,6 +212,7 @@ const presetFunctions = {
 	},
 	lazy_bones: () => {
 		parameters.particleSize = 15;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 1;
 		parameters.repulsion = 0.0001
 		parameters.attraction = 0.0001;
@@ -208,6 +222,7 @@ const presetFunctions = {
 	},
 	eclipse: () => {
 		parameters.particleSize = 5;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 4;
 		parameters.repulsion = 0.04;
 		parameters.attraction = 0.01;
@@ -220,6 +235,7 @@ const presetFunctions = {
 	},
 	orbit: () => {
 		parameters.particleSize = 5;
+		parameters.animationSpeed = 50;
 		parameters.orbit = 4;
 		parameters.repulsion = 0.04;
 		parameters.attraction = 0.01;
@@ -232,7 +248,8 @@ const presetFunctions = {
 		setAllParameters();
 	},
 	reset: () => {
-		parameters.particleSize= 5;
+		parameters.particleSize = 5;
+		parameters.animationSpeed = 50;
 		parameters.orbit= 4;
 		parameters.repulsion= 0.04;
 		parameters.attraction = 0.01;
@@ -288,6 +305,7 @@ sharing.add(setURL, 'copyURLToClipboard');
 export const initParameters = () => {
 	parameters.paramsInUrl = urlParams.get('paramsInUrl') !== null ? returnBinary(urlParams.get('paramsInUrl')) : parameters.paramsInUrl;
 	parameters.particleSize = urlParams.get('particleSize') !== null ? urlParams.get('particleSize') : parameters.particleSize;
+	parameters.animationSpeed = urlParams.get('animationSpeed') !== null ? urlParams.get('animationSpeed') : parameters.animationSpeed;
 	parameters.orbit = urlParams.get('orbit') !== null ? urlParams.get('orbit') : parameters.orbit;
 	parameters.repulsion = urlParams.get('repulsion') !== null ? urlParams.get('repulsion') : parameters.repulsion;
 	parameters.attraction = urlParams.get('attraction') !== null ? urlParams.get('attraction') : parameters.attraction;

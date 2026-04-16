@@ -4,6 +4,7 @@ body {
 }
 
 .content {
+	counter-reset: section;
 	height: 100vh;
 	width: 100vw;
 
@@ -29,4 +30,17 @@ body {
 	top: 100px;
 	width: 50%;
 	height: 50%;
+}
+
+// lil gui
+.lil-has-slider .lil-name::before {
+	// for the counted items
+	counter-increment: section;
+	content: counter(section);
+	margin-right: 5px;
+}
+
+.midi-row-end {
+	border-bottom: 1px solid white;
+	padding-bottom: 5px;
 }

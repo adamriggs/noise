@@ -12,7 +12,7 @@ export let parameters = {
 	pointerForce: 17,
 	pointerDistance: 100,
 	xCoeff: 0.001,
-	yCoeff: 0.002,
+	yCoeff: 0.01,
 	zCoeff: 0.003,
 	paramsInUrl: true,
 	hCoeff: 1,
@@ -73,7 +73,7 @@ animationSpeedParam.update = (value) => {
 animationSpeedParam.controller = gui.add(parameters, 'animationSpeed', 1, 100).onChange(value => animationSpeedParam.onChange(value));
 parametersObjects.push(animationSpeedParam);
 
-const noise3d = gui.addFolder('3dNoise');
+const noise3d = gui.addFolder('Noise');
 
 const orbitParam = new Param('orbit');
 orbitParam.update = (value) => {
@@ -140,29 +140,29 @@ zCoeffParam.update = (value) => {
 zCoeffParam.controller = noise3d.add(parameters, 'zCoeff', .000001, 0.01).onChange(value => zCoeffParam.onChange(value));
 parametersObjects.push(zCoeffParam);
 
-const hCoeffParam = new Param('hCoeff');
-hCoeffParam.update = (value) => {
-	parameters.hCoeff = value;
-	return value;
-};
-hCoeffParam.controller = noise3d.add(parameters, 'hCoeff', 0.01, 0.99).onChange(value => hCoeffParam.onChange(value));
-parametersObjects.push(hCoeffParam);
+// const hCoeffParam = new Param('hCoeff');
+// hCoeffParam.update = (value) => {
+// 	parameters.hCoeff = value;
+// 	return value;
+// };
+// hCoeffParam.controller = noise3d.add(parameters, 'hCoeff', 0.01, 0.99).onChange(value => hCoeffParam.onChange(value));
+// parametersObjects.push(hCoeffParam);
 
-const sCoeffParam = new Param('sCoeff');
-sCoeffParam.update = (value) => {
-	parameters.sCoeff = value;
-	return value;
-};
-sCoeffParam.controller = noise3d.add(parameters, 'sCoeff', 0.01, 0.99).onChange(value => sCoeffParam.onChange(value));
-parametersObjects.push(sCoeffParam);
+// const sCoeffParam = new Param('sCoeff');
+// sCoeffParam.update = (value) => {
+// 	parameters.sCoeff = value;
+// 	return value;
+// };
+// sCoeffParam.controller = noise3d.add(parameters, 'sCoeff', 0.01, 0.99).onChange(value => sCoeffParam.onChange(value));
+// parametersObjects.push(sCoeffParam);
 
-const lCoeffParam = new Param('lCoeff');
-lCoeffParam.update = (value) => {
-	parameters.lCoeff = value;
-	return value;
-};
-lCoeffParam.controller = noise3d.add(parameters, 'lCoeff', 0.01, 0.99).onChange(value => lCoeffParam.onChange(value));
-parametersObjects.push(lCoeffParam);
+// const lCoeffParam = new Param('lCoeff');
+// lCoeffParam.update = (value) => {
+// 	parameters.lCoeff = value;
+// 	return value;
+// };
+// lCoeffParam.controller = noise3d.add(parameters, 'lCoeff', 0.01, 0.99).onChange(value => lCoeffParam.onChange(value));
+// parametersObjects.push(lCoeffParam);
 
 /**
  * presets
@@ -233,7 +233,21 @@ const presetFunctions = {
 		parameters.zCoeff = 0.0001;
 		setAllParameters();
 	},
-	orbit: () => {
+	slosh: () => {
+		parameters.particleSize = 5;
+		parameters.animationSpeed = 50;
+		parameters.orbit = 4;
+		parameters.repulsion = 0.04;
+		parameters.attraction = 0.01;
+		parameters.pointerForce = 17;
+		parameters.pointerDistance = 100;
+		parameters.xCoeff = 0.001;
+		parameters.yCoeff = 0.002;
+		parameters.zCoeff = 0.003;
+		parameters.paramsInUrl = true;
+		setAllParameters();
+	},
+	reset: () => {
 		parameters.particleSize = 5;
 		parameters.animationSpeed = 50;
 		parameters.orbit = 4;
@@ -246,20 +260,6 @@ const presetFunctions = {
 		parameters.zCoeff = 0.003;
 		parameters.paramsInUrl = true;
 		setAllParameters();
-	},
-	reset: () => {
-		parameters.particleSize = 5;
-		parameters.animationSpeed = 50;
-		parameters.orbit= 4;
-		parameters.repulsion= 0.04;
-		parameters.attraction = 0.01;
-		parameters.pointerForce = 17;
-		parameters.pointerDistance = 100;
-		parameters.xCoeff= 0.001;
-		parameters.yCoeff= 0.002;
-		parameters.zCoeff= 0.003;
-		parameters.paramsInUrl= true;
-		setAllParameters();
 	}
 }
 
@@ -268,7 +268,7 @@ presets.add(presetFunctions, 'swarm');
 presets.add(presetFunctions, 'speedy_ball');
 presets.add(presetFunctions, 'lazy_bones');
 presets.add(presetFunctions, 'eclipse');
-presets.add(presetFunctions, 'orbit');
+presets.add(presetFunctions, 'slosh');
 presets.add(presetFunctions, 'reset');
 
 /**

@@ -161,10 +161,17 @@ const movement3dStep = (deltaTime) => {
 			}
 		}
 
-		const hue = (particle.hsl.h * colorDecay) * parameters.hCoeff;
-		const saturation = (particle.hsl.s * colorDecay) * parameters.sCoeff;
-		const lightness = (particle.hsl.l) * parameters.lCoeff + Math.abs(pointerXForce * pointerYForce);
-		const opacity = 1; // this isn't set here but I keep it here just to keep the formatting of the next line
+		let hue = parseInt(particle.hsl.h * colorDecay, 10);
+		let saturation = parseInt(particle.hsl.s * colorDecay, 10);
+		let lightness = parseInt(particle.hsl.l, 10) + Math.abs(pointerXForce * pointerYForce);
+		let opacity = 1; // this isn't set here but I keep it here just to keep the formatting of the next line
+
+
+		// hue = hue > 360 ? 360 : 0;
+		saturation = saturation < 0 ? 0 : saturation;
+		saturation = saturation > 100 ? 100 : saturation;
+		lightness = lightness < 0 ? 0 : lightness;
+		lightness = lightness > 100 ? 100 : lightness;
 
 		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
 		particle.particle.x += (velX + attractionX * parameters.attraction + pointerXForce) * deltaTime;
@@ -174,7 +181,6 @@ const movement3dStep = (deltaTime) => {
 
 const initFlowField = () => {
 	particlesField = generateparticles(totalParticlesField, particlesFieldContainer);
-
 }
 
 const flowFieldStep = (deltaTime) => {
@@ -190,8 +196,8 @@ const flowFieldStep = (deltaTime) => {
 		const xVal = Math.cos(angle) * particle.field.velocity;
 		const yVal = Math.sin(angle) * particle.field.velocity;
 
-		particle.field.x += xVal * deltaTime / 1;
-		particle.field.y += yVal * deltaTime / 1;
+		particle.field.x += xVal * deltaTime;
+		particle.field.y += yVal * deltaTime;
 
 		const distance = Math.hypot(midX - particle.field.x, midY - particle.field.y);
 		particle.distancePercentage = Math.min(distance / maxDistance, 1);
@@ -214,32 +220,17 @@ const flowFieldStep = (deltaTime) => {
 			particle.field.y = h;
 		}
 
-		// const colorAngle = Math.cos(colorPhase + (particle.angle * 0.5));
-		// const colorAngleMapped = mapRange(colorAngle, -1, 1, 0, 1);
+		let hue = Math.floor(Math.abs(parseInt(particle.hsl.h, 10) + (25 * (particle.distancePercentage))));
+		let saturation = Math.floor(Math.abs(parseInt(particle.hsl.s, 10) - (20 * particle.distancePercentage)));
+		let lightness = Math.floor(Math.abs(parseInt(particle.hsl.l, 10) - (20 * particle.distancePercentage)));
+		let opacity = .4;
 
-
-		const hue = Math.abs(parseInt(particle.hsl.h, 10) + (25 * (particle.distancePercentage)));
-		// const hue = parseInt(particle.hsl.h, 10);
-		// const hue = 1;
-		// const saturation = 50 - (20 * (particle.distancePercentage));
-		const saturation = Math.min(Math.abs(parseInt(particle.hsl.s, 10) - (20 * (particle.distancePercentage))));
-		// const saturation = 100;
-		// const lightness = 50 - (10 * (particle.distancePercentage));
-		const lightness = Math.min(Math.abs(parseInt(particle.hsl.l, 10) - (20 * (particle.distancePercentage))));
-		// const lightness = 100;
-		// const opacity = 0.25 - (0.1 * (particle.distancePercentage));
-		const opacity = .4;
 
 		particle.particle.tint = `hsla(${hue} ${saturation}% ${lightness}% / ${opacity}%)`;
 
 		particle.particle.x = particle.field.x;
 		particle.particle.y = particle.field.y;
 		particle.particle.alpha = opacity;
-
-		// console.log(particle.field.x, particle.particle.y);
-		// console.log(hue, saturation, lightness, opacity);
-		// console.log(particle.hsl);
-		// console.log('*****');
 	});
 }
 
@@ -273,8 +264,8 @@ const initApp = async () => {
 
 	fieldTrailSprite = new PIXI.Sprite(fieldTrailTexture);
 
-	app.stage.addChild(particlesFieldContainer);
 	app.stage.addChild(fieldTrailSprite);
+	app.stage.addChild(particlesFieldContainer);
 	app.stage.addChild(particles3dContainer);
 
 	fieldTrailSprite.alpha = .10;

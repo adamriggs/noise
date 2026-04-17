@@ -58,21 +58,9 @@ const totalParticlesField = 1000;
 const noise = createNoise3D();
 let colorPhase = 0;
 
-const particlesFieldContainer = new PIXI.ParticleContainer({
-	dynamicProperties: {
-		position: true, // default
-		vertex: false,
-		rotation: false,
-		color: false,
-	},
-});
-
-const fieldTrailTexture = PIXI.RenderTexture.create({
-	width: w,
-	height: w
-});
-
-const fieldTrailSprite = new PIXI.Sprite(fieldTrailTexture);
+let particlesFieldContainer;
+let fieldTrailTexture;
+let fieldTrailSprite;
 
 /**
  * MAIN FUNCTIONS
@@ -119,6 +107,9 @@ const initMovement3d = () => {
 }
 
 const movement3dStep = (deltaTime) => {
+	// if, instead of having the particles be attracted to the center of the viewport,
+	// they were attracted to the center point of their cloud then maybe that would be 
+	// boind like behavior
 	particles3d.forEach(particle => {
 
 		particle.particle.scaleX = parseInt(parameters.particleSize, 10) / 100;
@@ -265,6 +256,22 @@ const initApp = async () => {
 	});
 
 	contentElem.appendChild(app.canvas);
+
+	particlesFieldContainer = new PIXI.ParticleContainer({
+		dynamicProperties: {
+			position: true, // default
+			vertex: false,
+			rotation: false,
+			color: false,
+		},
+	});
+
+	fieldTrailTexture = PIXI.RenderTexture.create({
+		width: w,
+		height: h
+	});
+
+	fieldTrailSprite = new PIXI.Sprite(fieldTrailTexture);
 
 	app.stage.addChild(particlesFieldContainer);
 	app.stage.addChild(fieldTrailSprite);
